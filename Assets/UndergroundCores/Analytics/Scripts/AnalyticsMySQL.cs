@@ -6,7 +6,7 @@ using Leguar.TotalJSON;
 using MySql;
 using MySql.Data.MySqlClient;
 
-namespace N4M2Q
+namespace SWT
 {
   namespace Analytics
   {
@@ -59,6 +59,7 @@ namespace N4M2Q
       private void
       OnDestroy()
       {
+        _instance = null;
         if (_connection != null)
         {
           if (_connection.State != System.Data.ConnectionState.Closed)
@@ -82,7 +83,8 @@ namespace N4M2Q
           Debug.Log($"{reader[0]}--{reader[1]}");
         }
         reader.Close();
-
+        AnalyticsResponse r = new AnalyticsResponse();
+        OnRequestComplete(r);
       }
 
       private string ToRow(JSON doc)
@@ -162,6 +164,7 @@ namespace N4M2Q
                         $" STRINGVALUE  VARCHAR(255)," +
                         $" PRIMARY KEY(ID) );";
             _command = new MySqlCommand(sqlString, _connection);
+            OnRequestSent();
             ReadResponse(_command.ExecuteReader());
             if (!_dataMap[database].ContainsKey(table)) { _dataMap[database].Add(table, new List<string>()); }
           }
@@ -270,7 +273,7 @@ namespace N4M2Q
         Debug.Log($"Ping returned: {ping} \n" + (ping ? "Connection succesful" : "Connection failed"));
       }
 
-      public override JSON
+      protected override JSON
       CreateJSONHeader(string table)
       {
         JSON doc = new JSON();
@@ -279,7 +282,7 @@ namespace N4M2Q
         return doc;
       }
 
-      public override JSON
+      protected override JSON
       CreateJSONBody(string eventID)
       {
         JSON doc = new JSON();
