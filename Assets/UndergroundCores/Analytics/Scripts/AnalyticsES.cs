@@ -14,7 +14,7 @@ namespace SWT
 
       #region PrivateMembers
 
-      private List<string> _queue;
+      private List<string> _queue = new List<string>();
 
       #endregion
 
@@ -150,6 +150,8 @@ namespace SWT
       Initialize(string databaseURL)
       {
         base.Initialize(databaseURL);
+        if (_database == string.Empty) { _database = "default"; }
+        if (_url == string.Empty) { _url = "localhost:9200"; }
       }
 
 
@@ -183,9 +185,7 @@ namespace SWT
       private void Request_UploadStringCompleted(object sender, System.Net.UploadStringCompletedEventArgs e)
       {
         AnalyticsResponse response = new AnalyticsResponse();
-        response.SetError(e.Error);
-        response.SetCancelled(e.Cancelled);
-        response.SetMessage(e.Result);
+        response.SetData(e.Cancelled, e.Error, e.Result);
         OnRequestComplete(response);
       }
 

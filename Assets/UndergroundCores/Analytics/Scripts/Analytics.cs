@@ -15,6 +15,7 @@ namespace SWT
 
   namespace Analytics
   {
+    [System.Serializable]
     public class AnalyticsEvent : UnityEvent<AnalyticsResponse> { }
 
 
@@ -51,6 +52,13 @@ namespace SWT
       public void SetError(System.Exception e) { _error = e; }
 
       public void SetMessage(string msg) { _message = msg; }
+
+      public void SetData(bool ifCancelled, System.Exception ifException, string ifMsg = "")
+      {
+        _cancelled = ifCancelled;
+        _error = ifException;
+        _message = ifMsg;
+      }
 
     }
 
@@ -140,21 +148,25 @@ namespace SWT
       /// <summary>
       /// Private value of maxQueueTime
       /// </summary>
+      [SerializeField]
       protected uint _maxQueueTime = 30;
 
       /// <summary>
       /// Private value of maxQueueSize
       /// </summary>
+      [SerializeField]
       protected uint _maxQueueSize = 1000;
 
       /// <summary>
       /// Protected value of username
       /// </summary>
+      [SerializeField]
       protected string _username = "anonymous";
 
       /// <summary>
       /// Protected value of mail
       /// </summary>
+      [SerializeField]
       protected string _mail = "foo@bar.com";
 
       /// <summary>
@@ -170,11 +182,13 @@ namespace SWT
       /// <summary>
       /// Protected value of sessionTag
       /// </summary>
+      [SerializeField]
       protected string _sessionTag = "";
 
       /// <summary>
       /// Protected value of URL
       /// </summary>
+      [SerializeField]
       protected string _url = "";
 
       /// <summary>
