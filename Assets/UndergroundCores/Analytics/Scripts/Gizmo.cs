@@ -5,9 +5,8 @@ using UnityEngine;
 
 public class Gizmo : MonoBehaviour
 {
-  public string sprite;
-
 #if UNITY_EDITOR
+  public string sprite;
 
   void OnDrawGizmos()
   {

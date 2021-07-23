@@ -398,7 +398,7 @@ namespace SWT
       /// </summary>
       public virtual void
       Reset()
-      { }
+      {}
 
       /// <summary>
       /// Sends the information stored in the queue in a big batch so there is no
@@ -468,9 +468,7 @@ namespace SWT
       SendDesignEvent(string table,
                       string eventID,
                       string stringValue)
-      {
-
-      }
+      {}
 
       /// <summary>
       /// Sends a single Event to the database
@@ -484,9 +482,7 @@ namespace SWT
                       string eventID,
                       float floatValue,
                       string stringValue)
-      {
-
-      }
+      {}
 
       /// <summary>
       /// Adds an event to the Queue, when time runs out or queue gets to max size
@@ -497,9 +493,7 @@ namespace SWT
       public virtual void
       QueueDesignEvent(string table,
                        string eventID)
-      {
-
-      }
+      {}
 
       /// <summary>
       /// Adds an event to the Queue, when time runs out or queue gets to max size
@@ -512,9 +506,7 @@ namespace SWT
       QueueDesignEvent(string table,
                        string eventID,
                        float floatValue)
-      {
-
-      }
+      {}
 
       /// <summary>
       /// Adds an event to the Queue, when time runs out or queue gets to max size
@@ -527,9 +519,7 @@ namespace SWT
       QueueDesignEvent(string table,
                        string eventID,
                        string stringValue)
-      {
-
-      }
+      {}
 
       /// <summary>
       /// Adds an event to the Queue, when time runs out or queue gets to max size
@@ -544,9 +534,7 @@ namespace SWT
                        string eventID,
                        float floatValue,
                        string stringValue)
-      {
-
-      }
+      {}
 
       /// <summary>
       /// Sends an error type event, useful for unexpected or unwanted events
@@ -558,9 +546,7 @@ namespace SWT
       QueueErrorEvent(string table,
                       eErrorLevel severity,
                       string message)
-      {
-
-      }
+      {}
 
       /// <summary>
       /// Queries all data available with the given parameters
@@ -644,9 +630,7 @@ namespace SWT
       /// </summary>
       public virtual void 
       Ping()
-      {
-
-      }
+      {}
 
       #endregion
 

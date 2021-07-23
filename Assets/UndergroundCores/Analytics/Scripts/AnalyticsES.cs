@@ -16,6 +16,10 @@ namespace SWT
 
       private List<string> _queue = new List<string>();
 
+      private List<string> _responseQueue = new List<string>();
+
+      private Object _lock = new Object();
+
       #endregion
 
       #region MonobehaviorMethods
@@ -23,7 +27,7 @@ namespace SWT
       private void Awake()
       {
 
-        if (_instance != this) { Destroy(this.gameObject); }
+        if (_instance != this && _instance != null) { Destroy(this.gameObject); }
         else
         {
           _instance = this;
@@ -71,7 +75,7 @@ namespace SWT
         bodyStr.Replace('\n', ' ');
         bodyStr.Replace('\t', ' ');
 
-        string output = header + "\n" + body;
+        string output = headerStr + "\n" + bodyStr;
 
         _queue.Add(output);
 
@@ -97,6 +101,8 @@ namespace SWT
       protected override JSON
       CreateJSONHeader(string table)
       {
+        if (table == string.Empty) { table = "_doc"; }
+
         JSON header = new JSON();
         header.Add("_index", database);
         header.Add("_type", table);
@@ -142,6 +148,7 @@ namespace SWT
         body.Add("user_id", userID);
         body.Add("username", username);
         body.Add("user_mail", mail);
+        body.Add("event_id", eventID);
 
         return body;
       }
@@ -164,21 +171,31 @@ namespace SWT
       public override void
       SendQueue()
       {
-        if (_queue.Count >= maxQueueSize || (_queue.Count > 0 && _internalTime >= maxQueueTime))
+        // Lock to prevent data repetition, race problems and such
+        System.Threading.Monitor.Enter(_lock);
+        try
         {
-          string output = "";
-          foreach(string data in _queue)
+          if (_queue.Count >= maxQueueSize || (_queue.Count > 0 && _internalTime >= maxQueueTime))
           {
-            output += (data + "\n");
+            string output = "";
+            foreach (string data in _queue)
+            {
+              output += (data + "\n");
+            }
+
+            System.Net.WebClient request = new System.Net.WebClient();
+            System.Uri urlToPost = new System.Uri(url + "/_bulk?pretty");
+            request.Headers.Add("Content-Type", "application/json");
+
+            request.UploadStringCompleted += Request_UploadStringCompleted;
+            request.UploadStringAsync(urlToPost, "POST", output);
+            OnRequestSent();
           }
-
-          System.Net.WebClient request = new System.Net.WebClient();
-          System.Uri urlToPost = new System.Uri(url + "/_bulk?pretty");
-          request.Headers.Add("Content-Type", "application/json");
-
-          request.UploadStringCompleted += Request_UploadStringCompleted;
-          request.UploadStringAsync(urlToPost, "POST", output);
-          OnRequestSent();
+        }
+        catch
+        {
+          Debug.LogWarning("Someone is trying or forcing to send information while the request is" +
+                           "being still processed. Waiting for next opportunity");
         }
       }
 
@@ -186,6 +203,7 @@ namespace SWT
       {
         AnalyticsResponse response = new AnalyticsResponse();
         response.SetData(e.Cancelled, e.Error, e.Result);
+        System.Threading.Monitor.Exit(_lock);
         OnRequestComplete(response);
       }
 
@@ -217,7 +235,7 @@ namespace SWT
 
       public override void
       OnRequestComplete(AnalyticsResponse response)
-      { 
+      {
         if (response.cancelled)
         {
           Debug.LogError("The response was cancelled.\nThe reasons are: " + 
@@ -429,7 +447,7 @@ namespace SWT
           {
             Debug.Log(e.Result);
           });
-        request.DownloadString(urlToPost);
+        request.DownloadStringAsync(urlToPost);
         OnRequestSent();
       }
 
