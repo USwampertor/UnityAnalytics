@@ -7,8 +7,8 @@ using UnityEngine.Events;
 
 using Leguar.TotalJSON;
 
-using MySql;
-using MySql.Data.MySqlClient;
+// using MySql;
+// using MySql.Data.MySqlClient;
 
 namespace SWT
 {
@@ -22,37 +22,81 @@ namespace SWT
     [System.Serializable]
     public enum eErrorLevel : uint
     {
+      [Tooltip("Default value")]
       NONE = 0,
+      [Tooltip("Low level errors. This could be used for warnings")]
       LOW,
+      [Tooltip("Medium level errors. This could be used for errors that don't break or change behaviors")]
       MEDIUM,
+      [Tooltip("High level errors. This could be used for errors that need to be changed ASAP")]
       HIGH,
+      [Tooltip("Critical level errors. This errors could break the game")]
       CRITICAL
     }
 
     [System.Serializable]
     public class AnalyticsResponse
     {
+      /// <summary>
+      /// Public getter for _cancelled
+      /// </summary>
       [SerializeField]
       public bool cancelled { get => _cancelled; }
 
+      /// <summary>
+      /// Public getter for _error
+      /// </summary>
       [SerializeField]
       public System.Exception error { get => _error; }
 
+      /// <summary>
+      /// Public getter for _message
+      /// </summary>
       [SerializeField]
       public string message { get => _message; }
 
+      /// <summary>
+      /// A bool set if there was any cancellation on the response
+      /// </summary>
+      [Tooltip("True if the response was cancelled")]
       protected bool _cancelled = false;
 
+      /// <summary>
+      /// The Exception that contains the information of why and how an error appears
+      /// </summary>
+      [Tooltip("A C# exception filled with information if the response failed")]
       protected System.Exception _error = null;
 
+      /// <summary>
+      /// The message sent by the response
+      /// </summary>
+      [Tooltip("The response sent by the callback")]
       protected string _message = "";
 
+      /// <summary>
+      /// Sets the internal _cancelled value
+      /// </summary>
+      /// <param name="c">true if there was any cancellation</param>
       public void SetCancelled(bool c) { _cancelled = c; }
 
+      /// <summary>
+      /// Sets the internal _error value
+      /// </summary>
+      /// <param name="e">the error if there was any, if not, you can set this with null</param>
       public void SetError(System.Exception e) { _error = e; }
 
+      /// <summary>
+      /// Sets the internal _message value
+      /// </summary>
+      /// <param name="msg">the string of the response</param>
       public void SetMessage(string msg) { _message = msg; }
 
+      /// <summary>
+      /// Sets all the information of a response
+      /// </summary>
+      /// <param name="ifCancelled">true if there was any cancellation</param>
+      /// <param name="ifException">the error if there was any, if not, you can set this with null</param>
+      /// <param name="ifMsg">the string of the response</param>
       public void SetData(bool ifCancelled, System.Exception ifException, string ifMsg = "")
       {
         _cancelled = ifCancelled;
@@ -62,10 +106,13 @@ namespace SWT
 
     }
 
+    /// <summary>
+    /// The Analytics base class. It contains the base definitions for Analytics inheritance
+    /// </summary>
     public class Analytics : MonoBehaviour
     {
 
-      // Singleton
+      // Singleton/Module
       /// <summary>
       /// Returns the instance of the Analytics Object
       /// </summary>
@@ -76,12 +123,11 @@ namespace SWT
       /// <summary>
       /// Checks whether is the analytics object already created or not
       /// </summary>
-      public static bool created { get => _instance ?? false; } 
+      public static bool created { get => _instance ?? false; }
 
       /// <summary>
       /// The max time between queues
       /// </summary>
-
       public uint maxQueueTime { get => _maxQueueTime; }
 
       /// <summary>
@@ -126,13 +172,20 @@ namespace SWT
       public string url { get => _url; }
 
       /// <summary>
+      /// If the user needs credentials to access database
+      /// </summary>
+      public bool needsCredentials { get => _needsCredentials; }
+
+      /// <summary>
       /// Event to be sent once the request of queue is sent
       /// </summary>
+      [Tooltip("The events to be sent when the request is sent")]
       public UnityEvent RequestSentEvent = new UnityEvent();
 
       /// <summary>
       /// The event to be sent once the request of queue is completed
       /// </summary>
+      [Tooltip("The events to be sent when the request is complete")]
       public AnalyticsEvent RequestCompleteEvent = new AnalyticsEvent();
 
       #endregion
@@ -148,25 +201,25 @@ namespace SWT
       /// <summary>
       /// Private value of maxQueueTime
       /// </summary>
-      [SerializeField]
+      [SerializeField, Tooltip("The time to wait until analytics sends the batch")]
       protected uint _maxQueueTime = 30;
 
       /// <summary>
       /// Private value of maxQueueSize
       /// </summary>
-      [SerializeField]
+      [SerializeField, Tooltip("The max amount of objects to hold in the queue before batching it")]
       protected uint _maxQueueSize = 1000;
 
       /// <summary>
       /// Protected value of username
       /// </summary>
-      [SerializeField]
+      [SerializeField, Tooltip("Username of the player")]
       protected string _username = "anonymous";
 
       /// <summary>
       /// Protected value of mail
       /// </summary>
-      [SerializeField]
+      [SerializeField, Tooltip("use registered mail")]
       protected string _mail = "foo@bar.com";
 
       /// <summary>
@@ -182,13 +235,13 @@ namespace SWT
       /// <summary>
       /// Protected value of sessionTag
       /// </summary>
-      [SerializeField]
+      [SerializeField, Tooltip("The tag or tags of the session. This lets you organize and query")]
       protected string _sessionTag = "";
 
       /// <summary>
       /// Protected value of URL
       /// </summary>
-      [SerializeField]
+      [SerializeField, Tooltip("The url of the database")]
       protected string _url = "";
 
       /// <summary>
@@ -214,6 +267,7 @@ namespace SWT
       /// <summary>
       /// Whether the url needs credentials to store information in the database
       /// </summary>
+      [SerializeField, Tooltip("Check this if there is any need for credentials")]
       protected bool _needsCredentials = false;
 
       #endregion

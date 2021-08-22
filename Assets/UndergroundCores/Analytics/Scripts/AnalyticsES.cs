@@ -20,6 +20,8 @@ namespace SWT
 
       private Object _lock = new Object();
 
+      private float _ms = 0.0f;
+
       #endregion
 
       #region MonobehaviorMethods
@@ -43,7 +45,7 @@ namespace SWT
       private void Update()
       {
         _internalTime += Time.deltaTime;
-        if (_internalTime >= maxQueueSize)
+        if (_internalTime >= maxQueueTime)
         {
           SendQueue();
           _internalTime = 0.0f;
@@ -127,7 +129,11 @@ namespace SWT
         body.Add("os_family", SystemInfo.operatingSystemFamily.ToString());
         body.Add("os_version", System.Environment.OSVersion.Platform.ToString());
         body.Add("os_type", System.Environment.Is64BitOperatingSystem ? "x64" : "x86");
+
         // Basic Hardware Information
+        body.Add("device_name", SystemInfo.deviceName);
+        body.Add("device_model", SystemInfo.deviceModel);
+        body.Add("device_type", SystemInfo.deviceType);
 
         // CPU Information
         body.Add("cpu_name", SystemInfo.processorType);
@@ -187,6 +193,11 @@ namespace SWT
             System.Uri urlToPost = new System.Uri(url + "/_bulk?pretty");
             request.Headers.Add("Content-Type", "application/json");
 
+            if (needsCredentials)
+            {
+              request.Credentials = new System.Net.NetworkCredential(_urlUsername, _urlPassword);
+            }
+
             request.UploadStringCompleted += Request_UploadStringCompleted;
             request.UploadStringAsync(urlToPost, "POST", output);
             OnRequestSent();
@@ -221,7 +232,10 @@ namespace SWT
         System.Net.WebClient request = new System.Net.WebClient();
         System.Uri urlToPost = new System.Uri(url + "/_bulk?pretty");
         request.Headers.Add("Content-Type", "application/json");
-
+        if (needsCredentials)
+        {
+          request.Credentials = new System.Net.NetworkCredential(_urlUsername, _urlPassword);
+        }
         request.UploadStringCompleted += Request_UploadStringCompleted;
         request.UploadStringAsync(urlToPost, "POST", output);
         OnRequestSent();
@@ -231,6 +245,7 @@ namespace SWT
       OnRequestSent()
       {
         _queue.Clear();
+        base.OnRequestSent();
       }
 
       public override void
@@ -263,7 +278,10 @@ namespace SWT
         System.Net.WebClient request = new System.Net.WebClient();
         System.Uri urlToPost = new System.Uri(url + $"/{database}/{table}/message?pretty");
         request.Headers.Add("Content-Type", "application/json");
-
+        if (needsCredentials)
+        {
+          request.Credentials = new System.Net.NetworkCredential(_urlUsername, _urlPassword);
+        }
         request.UploadStringCompleted += Request_UploadStringCompleted;
         request.UploadStringAsync(urlToPost, "POST", bodyStr);
         OnRequestSent();
@@ -274,6 +292,7 @@ namespace SWT
                       string eventID,
                       float floatValue)
       {
+        if (table == string.Empty) { table = "_doc"; }
         var body = CreateJSONBody(eventID);
         body.Add("float_value", floatValue);
 
@@ -285,7 +304,10 @@ namespace SWT
         System.Net.WebClient request = new System.Net.WebClient();
         System.Uri urlToPost = new System.Uri(url + $"/{database}/{table}/message?pretty");
         request.Headers.Add("Content-Type", "application/json");
-
+        if (needsCredentials)
+        {
+          request.Credentials = new System.Net.NetworkCredential(_urlUsername, _urlPassword);
+        }
         request.UploadStringCompleted += Request_UploadStringCompleted;
         request.UploadStringAsync(urlToPost, "POST", bodyStr);
         OnRequestSent();
@@ -296,6 +318,7 @@ namespace SWT
                       string eventID,
                       string stringValue)
       {
+        if (table == string.Empty) { table = "_doc"; }
         var body = CreateJSONBody(eventID);
         body.Add("string_value", stringValue);
 
@@ -307,7 +330,10 @@ namespace SWT
         System.Net.WebClient request = new System.Net.WebClient();
         System.Uri urlToPost = new System.Uri(url + $"/{database}/{table}/message?pretty");
         request.Headers.Add("Content-Type", "application/json");
-
+        if (needsCredentials)
+        {
+          request.Credentials = new System.Net.NetworkCredential(_urlUsername, _urlPassword);
+        }
         request.UploadStringCompleted += Request_UploadStringCompleted;
         request.UploadStringAsync(urlToPost, "POST", bodyStr);
         OnRequestSent();
@@ -319,6 +345,7 @@ namespace SWT
                       float floatValue,
                       string stringValue)
       {
+        if (table == string.Empty) { table = "_doc"; }
         var body = CreateJSONBody(eventID);
         body.Add("float_value", floatValue);
         body.Add("string_value", stringValue);
@@ -331,7 +358,10 @@ namespace SWT
         System.Net.WebClient request = new System.Net.WebClient();
         System.Uri urlToPost = new System.Uri(url + $"/{database}/{table}/message?pretty");
         request.Headers.Add("Content-Type", "application/json");
-
+        if (needsCredentials)
+        {
+          request.Credentials = new System.Net.NetworkCredential(_urlUsername, _urlPassword);
+        }
         request.UploadStringCompleted += Request_UploadStringCompleted;
         request.UploadStringAsync(urlToPost, "POST", bodyStr);
         OnRequestSent();
